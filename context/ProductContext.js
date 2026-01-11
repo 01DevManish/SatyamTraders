@@ -14,13 +14,17 @@ export function ProductProvider({ children }) {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+                // Remove orderBy to avoid "Missing Index" error
+                const q = query(collection(db, 'products'));
                 const querySnapshot = await getDocs(q);
                 const fetchedProducts = querySnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data(),
                     isCustom: true
                 }));
+                // Sort client-side instead
+                fetchedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
                 setCustomProducts(fetchedProducts);
             } catch (error) {
                 console.error("Error fetching products: ", error);

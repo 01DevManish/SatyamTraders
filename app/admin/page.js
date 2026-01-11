@@ -9,6 +9,44 @@ import { storage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import styles from './page.module.css';
 
+// Client-side image compression helper
+const compressImage = async (file) => {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new window.Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Resize if too large (max width 1000px)
+                const MAX_WIDTH = 1000;
+                if (width > MAX_WIDTH) {
+                    height = Math.round((height * MAX_WIDTH) / width);
+                    width = MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Compress to JPEG with 0.7 quality
+                canvas.toBlob((blob) => {
+                    resolve(new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+                        type: 'image/jpeg',
+                        lastModified: Date.now(),
+                    }));
+                }, 'image/jpeg', 0.7);
+            };
+        };
+    });
+};
+
 export default function AdminPage() {
     const { products, customProducts, categories, addProduct, deleteProduct, isLoaded } = useProducts();
     const { isAdmin, loading, isLoggedIn } = useAuth();
@@ -16,7 +54,7 @@ export default function AdminPage() {
     const [showForm, setShowForm] = useState(false);
     const [imagePreview, setImagePreview] = useState('');
     const [imageFile, setImageFile] = useState(null);
-    const [uploading, setUploading] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState(''); // '' | 'compressing' | 'uploading' | 'saving'
 
     const [formData, setFormData] = useState({
         name: '', category: categories[0], price: '', originalPrice: '', description: '', badge: '', image: ''
@@ -48,22 +86,27 @@ export default function AdminPage() {
             return;
         }
 
-        setUploading(true);
         try {
-            // 1. Upload image to Firebase Storage
-            const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
-            const snapshot = await uploadBytes(storageRef, imageFile);
+            // 1. Compress Image
+            setUploadStatus('compressing');
+            const compressedFile = await compressImage(imageFile);
+
+            // 2. Upload to Firebase Storage
+            setUploadStatus('uploading');
+            const storageRef = ref(storage, `products/${Date.now()}_${compressedFile.name}`);
+            const snapshot = await uploadBytes(storageRef, compressedFile);
             const downloadURL = await getDownloadURL(snapshot.ref);
 
-            // 2. Add product to Firestore with image URL
+            // 3. Save to Firestore
+            setUploadStatus('saving');
             await addProduct({
                 ...formData,
                 price: parseInt(formData.price),
                 originalPrice: formData.originalPrice ? parseInt(formData.originalPrice) : null,
-                image: downloadURL // Use the Storage URL instead of base64
+                image: downloadURL
             });
 
-            // Reset form
+            // Reset
             setFormData({ name: '', category: categories[0], price: '', originalPrice: '', description: '', badge: '', image: '' });
             setImagePreview('');
             setImageFile(null);
@@ -73,18 +116,27 @@ export default function AdminPage() {
             console.error("Error adding product:", error);
             alert('Failed to add product. Please try again.');
         } finally {
-            setUploading(false);
+            setUploadStatus('');
         }
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if (confirm('Are you sure you want to delete this product?')) {
-            deleteProduct(id);
+            await deleteProduct(id);
         }
     };
 
     if (loading || !isLoaded) {
-        return <div className="page-header"><div className="container"><h1>Loading...</h1></div></div>;
+        return (
+            <div className="page-header">
+                <div className="container">
+                    <div style={{ textAlign: 'center', padding: '4rem' }}>
+                        <h2>Loading Admin Dashboard...</h2>
+                        <p className="text-muted">Verifying credentials and fetching products.</p>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     if (!isAdmin) {
@@ -131,6 +183,9 @@ export default function AdminPage() {
                                             )}
                                         </div>
                                         <input type="file" id="imageInput" accept="image/*" onChange={handleImageUpload} hidden />
+                                        <p style={{ marginTop: '10px', fontSize: '0.8rem', color: '#666' }}>
+                                            Images will be automatically optimized to speed up loading.
+                                        </p>
                                     </div>
 
                                     <div className={styles.formFields}>
@@ -170,8 +225,11 @@ export default function AdminPage() {
                                             <label>Description *</label>
                                             <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} required placeholder="Describe your product..." rows="3"></textarea>
                                         </div>
-                                        <button type="submit" className="btn btn-gold btn-lg" disabled={uploading}>
-                                            {uploading ? 'Uploading...' : 'Add Product'}
+                                        <button type="submit" className="btn btn-gold btn-lg" disabled={!!uploadStatus}>
+                                            {uploadStatus === 'compressing' ? 'Optimizing Image...' :
+                                                uploadStatus === 'uploading' ? 'Uploading Image...' :
+                                                    uploadStatus === 'saving' ? 'Saving Product...' :
+                                                        'Add Product'}
                                         </button>
                                     </div>
                                 </div>
