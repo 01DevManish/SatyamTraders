@@ -1,0 +1,140 @@
+.aboutHero {
+    background: linear-gradient(135deg, var(--color-green) 0%, var(--color-green-light) 100%);
+    color: var(--color-white);
+    padding: calc(80px + var(--space-3xl)) 0 var(--space-3xl);
+    text-align: center;
+}
+
+.aboutHero h1 {
+    color: var(--color-white);
+    margin-bottom: var(--space-md);
+}
+
+.aboutHero p {
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.aboutContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3xl);
+    align-items: center;
+}
+
+.aboutImage {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.aboutText h2 {
+    margin-bottom: var(--space-lg);
+}
+
+.aboutText p {
+    color: var(--color-warm-grey);
+    line-height: 1.8;
+}
+
+.valuesGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+}
+
+.valueCard {
+    text-align: center;
+    padding: var(--space-xl);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    transition: var(--transition-normal);
+}
+
+.valueCard:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.valueIcon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+}
+
+.valueCard h4 {
+    margin-bottom: var(--space-sm);
+}
+
+.valueCard p {
+    color: var(--color-warm-grey);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.mission {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--color-white);
+    padding: var(--space-3xl);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--color-gold);
+}
+
+.mission h2 {
+    color: var(--color-gold);
+    margin-bottom: var(--space-lg);
+}
+
+.mission p {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--color-warm-grey);
+    margin: 0;
+}
+
+.trustGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+    text-align: center;
+}
+
+.trustItem {
+    background: var(--color-white);
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+}
+
+.trustNumber {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    font-family: var(--font-display);
+}
+
+.trustItem span:last-child {
+    color: var(--color-warm-grey);
+    font-size: 0.95rem;
+}
+
+@media (max-width: 1024px) {
+    .aboutContent {
+        grid-template-columns: 1fr;
+    }
+
+    .valuesGrid,
+    .trustGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+
+    .valuesGrid,
+    .trustGrid {
+        grid-template-columns: 1fr;
+    }
+}

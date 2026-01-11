@@ -1,0 +1,214 @@
+.adminHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.adminHeader h2 {
+    margin-bottom: var(--space-xs);
+}
+
+.subtext {
+    color: var(--color-warm-grey);
+    font-size: 0.9rem;
+}
+
+.formCard {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+    border: 2px solid var(--color-gold);
+}
+
+.formCard h3 {
+    margin-bottom: var(--space-xl);
+    color: var(--color-gold);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: var(--space-2xl);
+}
+
+.imageUpload label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: var(--space-sm);
+}
+
+.uploadArea {
+    position: relative;
+    aspect-ratio: 1;
+    border: 2px dashed var(--color-beige);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    overflow: hidden;
+    transition: var(--transition-fast);
+    background: var(--color-cream);
+}
+
+.uploadArea:hover {
+    border-color: var(--color-gold);
+}
+
+.uploadPlaceholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-warm-grey);
+}
+
+.uploadPlaceholder span {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+}
+
+.uploadPlaceholder p {
+    margin: 0;
+}
+
+.formFields {
+    display: flex;
+    flex-direction: column;
+}
+
+.formFields .btn {
+    align-self: flex-start;
+    margin-top: var(--space-md);
+}
+
+.productTable {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.tableHeader {
+    display: grid;
+    grid-template-columns: 80px 2fr 1fr 1fr 100px;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-charcoal);
+    color: var(--color-white);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.tableRow {
+    display: grid;
+    grid-template-columns: 80px 2fr 1fr 1fr 100px;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--color-beige);
+    align-items: center;
+}
+
+.tableRow:last-child {
+    border-bottom: none;
+}
+
+.tableRow:hover {
+    background: var(--color-cream);
+}
+
+.productThumb {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-beige);
+}
+
+.productName h4 {
+    font-size: 0.95rem;
+    margin-bottom: var(--space-xs);
+    font-family: var(--font-primary);
+    font-weight: 500;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--color-green);
+    color: var(--color-white);
+    font-size: 0.7rem;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    margin-right: var(--space-xs);
+}
+
+.customBadge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--color-gold);
+    color: var(--color-white);
+    font-size: 0.7rem;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+}
+
+.price {
+    font-weight: 600;
+    color: var(--color-green);
+}
+
+.actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.actionBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--color-beige);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    background: var(--color-white);
+}
+
+.actionBtn:hover {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+}
+
+.deleteBtn:hover {
+    background: var(--color-error);
+    border-color: var(--color-error);
+}
+
+@media (max-width: 1024px) {
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .imageUpload {
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .tableHeader {
+        display: none;
+    }
+
+    .tableRow {
+        grid-template-columns: 60px 1fr auto;
+    }
+
+    .tableRow>span:nth-child(3) {
+        display: none;
+    }
+}

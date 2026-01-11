@@ -1,0 +1,113 @@
+.productCard {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition-normal);
+    position: relative;
+}
+
+.productCard:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.productImage {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--color-beige);
+}
+
+.productImage img {
+    transition: transform 0.5s ease;
+}
+
+.productCard:hover .productImage img {
+    transform: scale(1.05);
+}
+
+.productActions {
+    position: absolute;
+    bottom: var(--space-md);
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    display: flex;
+    gap: var(--space-sm);
+    opacity: 0;
+    transition: var(--transition-normal);
+}
+
+.productCard:hover .productActions {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.productActionBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-fast);
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.productActionBtn:hover {
+    background: var(--color-gold);
+}
+
+.productBadge {
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--color-green);
+    color: var(--color-white);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: var(--radius-sm);
+}
+
+.productInfo {
+    padding: var(--space-lg);
+}
+
+.productCategory {
+    font-size: 0.8rem;
+    color: var(--color-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--space-xs);
+    display: block;
+}
+
+.productTitle {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin-bottom: var(--space-sm);
+    font-weight: 500;
+}
+
+.productTitle a:hover {
+    color: var(--color-gold);
+}
+
+.productPrice {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--color-charcoal);
+}
+
+.originalPrice {
+    text-decoration: line-through;
+    color: var(--color-warm-grey);
+    font-weight: 400;
+    margin-left: var(--space-sm);
+    font-size: 0.95rem;
+}

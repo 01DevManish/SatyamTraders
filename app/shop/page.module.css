@@ -1,0 +1,108 @@
+.shopLayout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--space-2xl);
+}
+
+.sidebar {
+    background: var(--color-white);
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.filterGroup {
+    margin-bottom: var(--space-xl);
+}
+
+.filterGroup h4 {
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-beige);
+}
+
+.filterOption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.filterOption input {
+    accent-color: var(--color-gold);
+    width: 18px;
+    height: 18px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+}
+
+.toolbar span {
+    color: var(--color-warm-grey);
+}
+
+.sortSelect {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--color-beige);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    font-size: 0.95rem;
+}
+
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+}
+
+.noProducts {
+    text-align: center;
+    padding: var(--space-3xl);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+}
+
+.noProducts h3 {
+    margin-bottom: var(--space-sm);
+}
+
+.noProducts p {
+    color: var(--color-warm-grey);
+    margin: 0;
+}
+
+@media (max-width: 1024px) {
+    .shopLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+    }
+
+    .productsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .productsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar {
+        flex-direction: column;
+        gap: var(--space-md);
+        align-items: flex-start;
+    }
+}

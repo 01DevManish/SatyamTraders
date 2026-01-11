@@ -1,0 +1,100 @@
+.contactLayout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3xl);
+}
+
+.contactForm {
+    background: var(--color-white);
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+}
+
+.contactForm h3 {
+    margin-bottom: var(--space-xl);
+}
+
+.contactForm .btn {
+    margin-top: var(--space-md);
+}
+
+.successMessage {
+    text-align: center;
+    padding: var(--space-xl);
+}
+
+.successIcon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto var(--space-lg);
+    background: var(--color-success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--color-white);
+}
+
+.successMessage h4 {
+    margin-bottom: var(--space-sm);
+}
+
+.successMessage p {
+    color: var(--color-warm-grey);
+    margin: 0;
+}
+
+.contactInfo {
+    background: var(--color-green);
+    color: var(--color-white);
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+}
+
+.contactInfo h3 {
+    color: var(--color-white);
+    margin-bottom: var(--space-xl);
+}
+
+.contactItem {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.contactItem:last-child {
+    margin-bottom: 0;
+}
+
+.contactIcon {
+    font-size: 1.5rem;
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.contactItem h5 {
+    font-family: var(--font-primary);
+    color: var(--color-white);
+    margin-bottom: var(--space-xs);
+    font-weight: 600;
+}
+
+.contactItem p {
+    opacity: 0.9;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .contactLayout {
+        grid-template-columns: 1fr;
+    }
+}
