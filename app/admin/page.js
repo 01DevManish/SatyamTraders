@@ -5,13 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useProducts } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
-import { storage } from '@/lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import styles from './page.module.css';
 
-// Client-side image compression helper
-const compressImage = async (file) => {
-    return new Promise((resolve) => {
+// Helper: Compress and convert to Base64
+const processImageForDatabase = async (file) => {
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (event) => {
@@ -22,8 +20,8 @@ const compressImage = async (file) => {
                 let width = img.width;
                 let height = img.height;
 
-                // Resize if too large (max width 1000px)
-                const MAX_WIDTH = 1000;
+                // Resize to something safe for Database (Max 600px)
+                const MAX_WIDTH = 600;
                 if (width > MAX_WIDTH) {
                     height = Math.round((height * MAX_WIDTH) / width);
                     width = MAX_WIDTH;
@@ -35,15 +33,14 @@ const compressImage = async (file) => {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Compress to JPEG with 0.7 quality
-                canvas.toBlob((blob) => {
-                    resolve(new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
-                        type: 'image/jpeg',
-                        lastModified: Date.now(),
-                    }));
-                }, 'image/jpeg', 0.7);
+                // Compress to JPEG with 0.6 quality
+                // This usually results in a string size ~50-100KB, well under 1MB limit
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                resolve(dataUrl);
             };
+            img.onerror = (err) => reject(err);
         };
+        reader.onerror = (err) => reject(err);
     });
 };
 
@@ -54,7 +51,7 @@ export default function AdminPage() {
     const [showForm, setShowForm] = useState(false);
     const [imagePreview, setImagePreview] = useState('');
     const [imageFile, setImageFile] = useState(null);
-    const [uploadStatus, setUploadStatus] = useState(''); // '' | 'compressing' | 'uploading' | 'saving'
+    const [uploadStatus, setUploadStatus] = useState('');
 
     const [formData, setFormData] = useState({
         name: '', category: categories[0], price: '', originalPrice: '', description: '', badge: '', image: ''
@@ -71,10 +68,9 @@ export default function AdminPage() {
         const file = e.target.files[0];
         if (file) {
             setImageFile(file);
+            // Show preview immediately
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
+            reader.onloadend = () => setImagePreview(reader.result);
             reader.readAsDataURL(file);
         }
     };
@@ -87,23 +83,26 @@ export default function AdminPage() {
         }
 
         try {
-            // 1. Compress Image
             setUploadStatus('compressing');
-            const compressedFile = await compressImage(imageFile);
 
-            // 2. Upload to Firebase Storage
-            setUploadStatus('uploading');
-            const storageRef = ref(storage, `products/${Date.now()}_${compressedFile.name}`);
-            const snapshot = await uploadBytes(storageRef, compressedFile);
-            const downloadURL = await getDownloadURL(snapshot.ref);
+            // 1. Process Image (Resize & Compress)
+            const compressedBase64 = await processImageForDatabase(imageFile);
 
-            // 3. Save to Firestore
+            // Check size (Firestore limit is ~1MB = 1,048,576 bytes)
+            // Base64 string length * 0.75 is approx file size in bytes
+            const approxSize = compressedBase64.length * 0.75;
+            if (approxSize > 900000) { // Safety margin 900KB
+                throw new Error("Image is still too large after compression. Please try a simpler image.");
+            }
+
             setUploadStatus('saving');
+
+            // 2. Save directly to Database
             await addProduct({
                 ...formData,
                 price: parseInt(formData.price),
                 originalPrice: formData.originalPrice ? parseInt(formData.originalPrice) : null,
-                image: downloadURL
+                image: compressedBase64 // Saving the image string directly
             });
 
             // Reset
@@ -111,10 +110,10 @@ export default function AdminPage() {
             setImagePreview('');
             setImageFile(null);
             setShowForm(false);
-            alert('Product added successfully!');
+            alert('Product saved to database successfully!');
         } catch (error) {
             console.error("Error adding product:", error);
-            alert('Failed to add product. Please try again.');
+            alert(`Failed: ${error.message}`);
         } finally {
             setUploadStatus('');
         }
@@ -131,8 +130,7 @@ export default function AdminPage() {
             <div className="page-header">
                 <div className="container">
                     <div style={{ textAlign: 'center', padding: '4rem' }}>
-                        <h2>Loading Admin Dashboard...</h2>
-                        <p className="text-muted">Verifying credentials and fetching products.</p>
+                        <h2>Loading...</h2>
                     </div>
                 </div>
             </div>
@@ -184,7 +182,7 @@ export default function AdminPage() {
                                         </div>
                                         <input type="file" id="imageInput" accept="image/*" onChange={handleImageUpload} hidden />
                                         <p style={{ marginTop: '10px', fontSize: '0.8rem', color: '#666' }}>
-                                            Images will be automatically optimized to speed up loading.
+                                            Image will be compressed to fit in database.
                                         </p>
                                     </div>
 
@@ -226,10 +224,9 @@ export default function AdminPage() {
                                             <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} required placeholder="Describe your product..." rows="3"></textarea>
                                         </div>
                                         <button type="submit" className="btn btn-gold btn-lg" disabled={!!uploadStatus}>
-                                            {uploadStatus === 'compressing' ? 'Optimizing Image...' :
-                                                uploadStatus === 'uploading' ? 'Uploading Image...' :
-                                                    uploadStatus === 'saving' ? 'Saving Product...' :
-                                                        'Add Product'}
+                                            {uploadStatus === 'compressing' ? 'Compressing Image...' :
+                                                uploadStatus === 'saving' ? 'Saving to DB...' :
+                                                    'Add Product'}
                                         </button>
                                     </div>
                                 </div>
