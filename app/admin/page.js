@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useProducts } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import styles from './page.module.css';
 
 export default function AdminPage() {
@@ -13,6 +15,9 @@ export default function AdminPage() {
     const router = useRouter();
     const [showForm, setShowForm] = useState(false);
     const [imagePreview, setImagePreview] = useState('');
+    const [imageFile, setImageFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+
     const [formData, setFormData] = useState({
         name: '', category: categories[0], price: '', originalPrice: '', description: '', badge: '', image: ''
     });
@@ -27,30 +32,49 @@ export default function AdminPage() {
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
+            setImageFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result);
-                setFormData(prev => ({ ...prev, image: reader.result }));
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.image) {
+        if (!imageFile) {
             alert('Please upload a product image');
             return;
         }
-        addProduct({
-            ...formData,
-            price: parseInt(formData.price),
-            originalPrice: formData.originalPrice ? parseInt(formData.originalPrice) : null,
-        });
-        setFormData({ name: '', category: categories[0], price: '', originalPrice: '', description: '', badge: '', image: '' });
-        setImagePreview('');
-        setShowForm(false);
-        alert('Product added successfully!');
+
+        setUploading(true);
+        try {
+            // 1. Upload image to Firebase Storage
+            const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
+            const snapshot = await uploadBytes(storageRef, imageFile);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+
+            // 2. Add product to Firestore with image URL
+            await addProduct({
+                ...formData,
+                price: parseInt(formData.price),
+                originalPrice: formData.originalPrice ? parseInt(formData.originalPrice) : null,
+                image: downloadURL // Use the Storage URL instead of base64
+            });
+
+            // Reset form
+            setFormData({ name: '', category: categories[0], price: '', originalPrice: '', description: '', badge: '', image: '' });
+            setImagePreview('');
+            setImageFile(null);
+            setShowForm(false);
+            alert('Product added successfully!');
+        } catch (error) {
+            console.error("Error adding product:", error);
+            alert('Failed to add product. Please try again.');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const handleDelete = (id) => {
@@ -146,7 +170,9 @@ export default function AdminPage() {
                                             <label>Description *</label>
                                             <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} required placeholder="Describe your product..." rows="3"></textarea>
                                         </div>
-                                        <button type="submit" className="btn btn-gold btn-lg">Add Product</button>
+                                        <button type="submit" className="btn btn-gold btn-lg" disabled={uploading}>
+                                            {uploading ? 'Uploading...' : 'Add Product'}
+                                        </button>
                                     </div>
                                 </div>
                             </form>
