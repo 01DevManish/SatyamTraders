@@ -1,0 +1,32 @@
+[
+  {
+    "id": "9ac0b36e-f865-45da-a04f-09c8370ea1a9",
+    "name": "Humidier Fire",
+    "price": 219,
+    "originalPrice": 599,
+    "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSUeKCMmDW6MqYRNnIRIMg-nutyMJJkFSbAa_WJwo26-RyVft3eq7NT3IjcWcDckjLqP7ji6gSrYuFkooCWR9TyU-D6X8RrvxnQ09JOzL-aqM568IBkSPsA",
+    "category": "Test",
+    "collection": "Test",
+    "stock": 5,
+    "sku": "testing",
+    "sizes": [],
+    "status": "active",
+    "createdAt": 1777635559919
+  },
+  {
+    "id": "ebd18ff5-7885-496a-8499-31e4050c0077",
+    "name": "Humidifier",
+    "price": 219,
+    "originalPrice": 599,
+    "image": "https://www.amazon.in/Diffuser-Fireplace-Humidifier-Aromatherapy-Bedroom/dp/B0DQKQP2L5",
+    "category": "Test",
+    "collection": "Test",
+    "stock": 6,
+    "sku": "Test",
+    "sizes": [
+      "5"
+    ],
+    "status": "active",
+    "createdAt": 1777635437729
+  }
+]
